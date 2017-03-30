@@ -33,10 +33,10 @@ class Main extends Phaser.State {
 
         this.game.physics.arcade.overlap(this.helicopter.sprite, this.walls.spriteGroup, this.collideDecision, null, this);
 
-        // Check if out of bounds
-        if(this.helicopter.isOutOfBounds()){
-            this.gameOver();
-        }
+        // // Check if out of bounds
+        // if(this.helicopter.isOutOfBounds()){
+        //     this.gameOver();
+        // }
 
         // Check if  helicopter is rising
         if(this.helicopter.isRising){

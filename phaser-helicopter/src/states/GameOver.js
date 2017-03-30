@@ -3,7 +3,10 @@ class GameOver extends Phaser.State {
 	create() {
         console.log("game over, man");
         this.sprite = this.game.add.sprite(this.game.world.centerX, this.game.world.centerY, 'unicorn');
-        this.text = this.game.add.text(this.game.world.centerX, this.game.world.centerY, `YOU'RE OUT OF MONEY, BRO`, {
+        this.sprite.inputEnabled = true;
+        this.sprite.events.onInputDown.add(this.restartGame, this);
+
+        this.text = this.game.add.text(this.game.world.centerX, this.game.world.centerY, `YOU'RE OUT OF MONEY, BRO\nClick the unicorn to try again.`, {
             font: "72px Arial",
             fill: "#ABCDEF",
             align: "center"
@@ -12,7 +15,7 @@ class GameOver extends Phaser.State {
 	}
 
 	restartGame() {
-		this.game.state.start("Main");
+        console.log(this.game.state.start("GameTitle"));
 	}
 
     update() {

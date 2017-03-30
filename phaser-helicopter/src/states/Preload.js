@@ -10,7 +10,7 @@ class Preload extends Phaser.State {
 
 	create() {
 		//NOTE: Change to GameTitle if required
-		this.game.state.start("Main");
+		this.game.state.start("GameTitle");
 	}
 
 }
