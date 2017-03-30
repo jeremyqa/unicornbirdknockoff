@@ -7,7 +7,7 @@ class MovingWalls {
 
         let seed = Date.now();
         this.random = new Phaser.RandomDataGenerator([seed]);
-        this.wallSpeed = this.random.integerInRange(250, 700);
+        this.wallSpeed = this.random.integerInRange(750, 1500);
 
         this.initWalls();
     }
@@ -25,14 +25,15 @@ class MovingWalls {
 
         this.spriteGroup = this.game.add.group();
         this.spriteGroup.enableBody = true;
-        this.spriteGroup.createMultiple(10, wallSpriteTexture);
+        this.spriteGroup.createMultiple(15, wallSpriteTexture);
 
     }
 
     spawn(){
 
         let wall = this.spriteGroup.getFirstDead();
-        wall.scale.setTo(this.game.rnd.realInRange(1, 3), this.game.rnd.realInRange(1, 3));
+        wall.scale.setTo(this.game.rnd.realInRange(1, 1.2), this.game.rnd.realInRange(1, 4));
+        wall.body.updateBounds(wall.scale.x, wall.scale.y);
         wall.body.gravity.y = 0;
 
         wall.reset(this.game.world.width, this.random.integerInRange(0, this.game.world.height));
@@ -45,14 +46,21 @@ class MovingWalls {
         wall.outOfBoundsKill = true;
         wall.name = "foobar wall";
 
-        /*
-        ok so the idea here is that any wall might be + or - money
-        so first decide the value -- ok
-        then set the color
-         */
 
-        // wall.points = this.random.integerInRange(-10000, 10000)
-        wall.points = 0
+
+        let wall_type = this.random.integerInRange(0,5); // to do this is stupid
+        if (wall_type == 1) {
+            wall.tint = 0x00ff00;
+            wall.points = 1000
+        }
+        // else if (wall_type == 2) {
+        //     wall.tint = 0x0000FF;
+        //     wall.points = 0
+        // }
+        else {
+            wall.tint = 0xFF0000;
+            wall.points = -5000;
+        }
 
     }
 

@@ -4,6 +4,7 @@ import MovingWalls from 'objects/MovingWalls';
 class Main extends Phaser.State {
     create() {
         console.log("hello world -- create()");
+        // this.game.add.sprite(0,0,'unicorn');
 
         this.money = 10000;
         //Enable Arcade Physics
@@ -50,15 +51,13 @@ class Main extends Phaser.State {
         }
 
         if(this.helicopter.sprite.body.blocked.down === true || this.helicopter.sprite.body.blocked.up == true) {
-            this.money -= 100;
+            this.money -= 300;
         }
 
         this.text.setText(`$${this.money}`);
     }
 
     collideDecision(a, b) {
-        console.log(a.name);
-        console.log(b.points);
         this.money += b.points;
         b.kill();
 
@@ -70,11 +69,12 @@ class Main extends Phaser.State {
     }
 
     addTimers(){
-        this.game.time.events.loop(2000, this.walls.spawn, this.walls);
+        this.game.time.events.loop(750, this.walls.spawn, this.walls);
     }
 
     gameOver(){
-        this.game.state.restart();
+        // this.game.state.restart();
+        this.game.state.start('GameOver')
     }
 
 }

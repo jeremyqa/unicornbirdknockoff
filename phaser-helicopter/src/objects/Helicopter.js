@@ -8,18 +8,21 @@ class Helicopter {
 
     spawn(){
 
-        let helicopterSprite = new Phaser.Graphics(this.game)
-            .beginFill(Phaser.Color.hexToRGB('#2c3e50'), 1)
-            .drawRect(0, 0, 100, 100);
+        // let helicopterSprite = new Phaser.Graphics(this.game)
+        //     .beginFill(Phaser.Color.hexToRGB('#2c3e50'), 1)
+        //     .drawRect(0, 0, 75, 75);
+        //
+        // let helicopterSpriteTexture = helicopterSprite.generateTexture();
 
-        let helicopterSpriteTexture = helicopterSprite.generateTexture();
 
-        this.sprite = this.game.add.sprite(this.game.world.centerX, this.game.world.centerY, helicopterSpriteTexture);
+        this.sprite = this.game.add.sprite(200, this.game.world.centerY, 'unicorn');
         this.sprite.name = "player";
         this.game.physics.arcade.enable(this.sprite);
         this.sprite.enableBody = true;
 
-        this.sprite.body.gravity.y = 5000;
+        this.sprite.animations.add('walk', [0,1], 10, true);
+        this.sprite.animations.play('walk', 10, true);
+        this.sprite.body.gravity.y = 4500;
         this.sprite.body.velocity.y = -1500;
         this.sprite.body.collideWorldBounds = true;
 
@@ -35,8 +38,10 @@ class Helicopter {
         this.isRising = false;
     }
 
-    increaseVerticalVelocity(){
-        this.sprite.body.velocity.y -= 200;
+    increaseVerticalVelocity() {
+        this.sprite.body.velocity.y = Math.max(-1600, this.sprite.body.velocity.y - 150);
+        // this.sprite.body.velocity.y -= 200;
+
     }
 
     isOutOfBounds(){
