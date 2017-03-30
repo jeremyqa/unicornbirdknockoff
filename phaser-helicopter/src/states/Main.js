@@ -3,14 +3,17 @@ import MovingWalls from 'objects/MovingWalls';
 
 class Main extends Phaser.State {
     create() {
-        console.log("hello world -- create()");
+        console.log("hello world -- test");
         // this.game.add.sprite(0,0,'unicorn');
+        // localStorage.setItem("jjj", "my value");
+        this.highScore = localStorage.getItem("highScore");
 
-        this.money = 10000;
-        //Enable Arcade Physics
+        if (this.highScore === null) {
+            this.highScore = 0;
+        }
+        this.money = 0;
+
         this.game.physics.startSystem(Phaser.Physics.ARCADE);
-
-        //Set the games background colour
         this.game.stage.backgroundColor = '#6699CC';
 
         this.helicopter = new Helicopter(this.game);
@@ -21,7 +24,7 @@ class Main extends Phaser.State {
         this.addControls();
         this.addTimers();
 
-        this.text = this.game.add.text(50, 10, `$${this.money}`, {
+        this.text = this.game.add.text(150, 10, `scores here`, {
             font: "20px Arial",
             fill: "#000000",
             align: "center"
@@ -43,24 +46,25 @@ class Main extends Phaser.State {
             this.helicopter.increaseVerticalVelocity();
         }
 
-        this.money--;
+        this.money++;
 
-
+        if(this.money > this.highScore) {
+            this.highScore = this.money;
+        }
         if(this.money < 1) {
             this.gameOver();
         }
 
         if(this.helicopter.sprite.body.blocked.down === true || this.helicopter.sprite.body.blocked.up == true) {
-            this.money -= 300;
+            this.money -= 2;
         }
 
-        this.text.setText(`$${this.money}`);
+        this.text.setText(`$${this.money} Top: $${this.highScore}`);
     }
 
     collideDecision(a, b) {
         this.money += b.points;
         b.kill();
-
     }
 
     addControls(){
@@ -73,7 +77,7 @@ class Main extends Phaser.State {
     }
 
     gameOver(){
-        // this.game.state.restart();
+        localStorage.setItem("highScore", this.highScore);
         this.game.state.start('GameOver')
     }
 

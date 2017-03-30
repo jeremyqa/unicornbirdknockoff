@@ -7,7 +7,6 @@ class MovingWalls {
 
         let seed = Date.now();
         this.random = new Phaser.RandomDataGenerator([seed]);
-        this.wallSpeed = this.random.integerInRange(750, 1500);
 
         this.initWalls();
     }
@@ -31,6 +30,7 @@ class MovingWalls {
 
     spawn(){
 
+        this.wallSpeed = this.random.integerInRange(750, 1500);
         let wall = this.spriteGroup.getFirstDead();
         wall.scale.setTo(this.game.rnd.realInRange(1, 1.2), this.game.rnd.realInRange(1, 4));
         wall.body.updateBounds(wall.scale.x, wall.scale.y);
@@ -48,18 +48,14 @@ class MovingWalls {
 
 
 
-        let wall_type = this.random.integerInRange(0,5); // to do this is stupid
+        let wall_type = this.random.integerInRange(0,4); // to do this is stupid
         if (wall_type == 1) {
             wall.tint = 0x00ff00;
             wall.points = 1000
         }
-        // else if (wall_type == 2) {
-        //     wall.tint = 0x0000FF;
-        //     wall.points = 0
-        // }
         else {
             wall.tint = 0xFF0000;
-            wall.points = -5000;
+            wall.points = -15000;
         }
 
     }

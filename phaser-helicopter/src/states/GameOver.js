@@ -6,7 +6,7 @@ class GameOver extends Phaser.State {
         this.sprite.inputEnabled = true;
         this.sprite.events.onInputDown.add(this.restartGame, this);
 
-        this.text = this.game.add.text(this.game.world.centerX, this.game.world.centerY, `YOU'RE OUT OF MONEY, BRO\nClick the unicorn to try again.`, {
+        this.text = this.game.add.text(this.game.world.centerX, this.game.world.centerY, `YOU'RE OUT OF MONEY :(\nClick the unicorn to try again.`, {
             font: "72px Arial",
             fill: "#ABCDEF",
             align: "center"
