@@ -4,8 +4,6 @@ import MovingWalls from 'objects/MovingWalls';
 class Main extends Phaser.State {
     create() {
         console.log("hello world -- test");
-        // this.game.add.sprite(0,0,'unicorn');
-        // localStorage.setItem("jjj", "my value");
         this.highScore = localStorage.getItem("highScore");
 
         if (this.highScore === null) {
@@ -35,6 +33,7 @@ class Main extends Phaser.State {
     update() {
 
         this.game.physics.arcade.overlap(this.helicopter.sprite, this.walls.spriteGroup, this.collideDecision, null, this);
+        this.game.physics.arcade.overlap(this.helicopter.sprite, this.walls.coinGroup, this.collideDecision, null, this);
 
         // // Check if out of bounds
         // if(this.helicopter.isOutOfBounds()){

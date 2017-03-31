@@ -2,23 +2,37 @@ class GameTitle extends Phaser.State {
 
 	create() {
         this.game.stage.backgroundColor = '#000000';
-        this.sprite = this.game.add.sprite(200, this.game.world.centerY, 'unicorn');
-        this.sprite.animations.add('walk', [0,1], 10, true);
-        this.sprite.animations.play('walk', 10, true);
+        this.addUnicornToTitleScreen();
+        this.addCoinToTitleScreen();
+        this.addInsructionsTextToTitle();
 
-        this.text = this.game.add.text(this.game.world.centerX, 200, `GREEN FOR MONEY. RED IS BAD.\nLose points for touching the edge.\nHold mouse to fly up. \nRelease to fall.\nClick unicorn to start`, {
-            font: "64px Arial",
+        this.sprite.inputEnabled = true;
+        this.sprite.events.onInputDown.add(this.getStarted, this);
+
+	}
+
+    addInsructionsTextToTitle() {
+        this.text = this.game.add.text(this.game.world.centerX, 200, `COLLECT COINS - AVOID AUSTERITY PANDAS.\nLose points for touching the edge.\nHold mouse to fly up. \nRelease to fall.\nClick unicorn to start`, {
+            font: "52px Arial",
             fill: "#ABCDEF",
             align: "center"
         });
         this.text.anchor.setTo(0.5, 0.5);
+    }
 
-        this.sprite.inputEnabled = true;
-        this.sprite.events.onInputDown.add(this.foo, this);
-	}
+    addUnicornToTitleScreen() {
+        this.sprite = this.game.add.sprite(200, this.game.world.centerY, 'unicorn');
+        this.sprite.animations.add('walk', [0, 1], 10, true);
+        this.sprite.animations.play('walk', 10, true);
+    }
 
-	foo() {
-        console.log('click')
+    addCoinToTitleScreen() {
+        this.coin = this.game.add.sprite(400, this.game.world.centerY, 'coin');
+        this.coin.animations.add('spin', [0, 1, 2, 3, 4, 5, 6, 7, 8], 10, true);
+        this.coin.animations.play('spin', 10, true);
+    }
+
+	getStarted() {
 		this.game.state.start("Main");
 	}
 

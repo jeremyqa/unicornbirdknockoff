@@ -15,7 +15,7 @@ class GameOver extends Phaser.State {
 	}
 
 	restartGame() {
-        console.log(this.game.state.start("GameTitle"));
+        this.game.state.start("GameTitle");
 	}
 
     update() {
