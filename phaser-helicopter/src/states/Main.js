@@ -67,8 +67,14 @@ class Main extends Phaser.State {
     }
 
     addControls(){
+        let space = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+        space.onDown.add(this.helicopter.setRising, this.helicopter);
+        space.onUp.add(this.helicopter.setFalling, this.helicopter);
         this.game.input.onDown.add(this.helicopter.setRising, this.helicopter);
         this.game.input.onUp.add(this.helicopter.setFalling, this.helicopter);
+
+        let escape = this.game.input.keyboard.addKey(Phaser.Keyboard.ESC);
+        escape.onDown.add(this.gameOver, this);
     }
 
     addTimers(){
