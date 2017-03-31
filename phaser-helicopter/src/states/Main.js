@@ -5,9 +5,14 @@ class Main extends Phaser.State {
     create() {
         console.log("hello world -- test");
         this.highScore = localStorage.getItem("highScore");
+        this.highPandaCost = localStorage.getItem("highPandaCost");
 
         if (this.highScore === null) {
             this.highScore = 0;
+        }
+        
+        if (this.highPandaCost === null) {
+            this.highPandaCost = 0;
         }
         this.money = 0;
 
@@ -44,6 +49,7 @@ class Main extends Phaser.State {
         if(this.money > this.highScore) {
             this.highScore = this.money;
         }
+        
         if(this.money < 1) {
             this.gameOver();
         }
@@ -58,6 +64,9 @@ class Main extends Phaser.State {
     collideDecision(a, b) {
         this.money += b.points;
         if (b.points < 0) {
+            if(this.highPandaCost > this.walls.getBadPoints()) {
+                this.highPandaCost = this.walls.getBadPoints();
+            }
             this.walls.doubleBadPoints()
         }
         else {
@@ -93,7 +102,9 @@ class Main extends Phaser.State {
     }
 
     gameOver(){
+        console.log(this.highPandaCost);
         localStorage.setItem("highScore", this.highScore);
+        localStorage.setItem("highPandaCost", this.highPandaCost);
         this.game.state.start('GameOver')
     }
 
