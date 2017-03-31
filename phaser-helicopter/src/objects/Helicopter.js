@@ -7,14 +7,7 @@ class Helicopter {
     }
 
     spawn(){
-
-        // let helicopterSprite = new Phaser.Graphics(this.game)
-        //     .beginFill(Phaser.Color.hexToRGB('#2c3e50'), 1)
-        //     .drawRect(0, 0, 75, 75);
-        //
-        // let helicopterSpriteTexture = helicopterSprite.generateTexture();
-
-
+        
         this.sprite = this.game.add.sprite(200, this.game.world.centerY, 'unicorn');
         this.sprite.name = "player";
         this.game.physics.arcade.enable(this.sprite);
@@ -40,8 +33,6 @@ class Helicopter {
 
     increaseVerticalVelocity() {
         this.sprite.body.velocity.y = Math.max(-1600, this.sprite.body.velocity.y - 150);
-        // this.sprite.body.velocity.y -= 200;
-
     }
 
     isOutOfBounds(){

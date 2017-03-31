@@ -22,7 +22,7 @@ class Main extends Phaser.State {
         this.addControls();
         this.addTimers();
 
-        this.text = this.game.add.text(150, 10, `scores here`, {
+        this.text = this.game.add.text(225, 10, `scores here`, {
             font: "20px Arial",
             fill: "#000000",
             align: "center"
@@ -35,12 +35,6 @@ class Main extends Phaser.State {
         this.game.physics.arcade.overlap(this.helicopter.sprite, this.walls.spriteGroup, this.collideDecision, null, this);
         this.game.physics.arcade.overlap(this.helicopter.sprite, this.walls.coinGroup, this.collideDecision, null, this);
 
-        // // Check if out of bounds
-        // if(this.helicopter.isOutOfBounds()){
-        //     this.gameOver();
-        // }
-
-        // Check if  helicopter is rising
         if(this.helicopter.isRising){
             this.helicopter.increaseVerticalVelocity();
         }
@@ -58,23 +52,40 @@ class Main extends Phaser.State {
             this.money -= 2;
         }
 
-        this.text.setText(`$${this.money} Top: $${this.highScore}`);
+        this.text.setText(`$${this.money} Top: $${this.highScore} Panda Cost: -$${this.walls.getBadPoints()*-1}`);
     }
 
     collideDecision(a, b) {
         this.money += b.points;
+        if (b.points < 0) {
+            this.walls.doubleBadPoints()
+        }
+        else {
+            this.walls.changeBadPoints(-100);
+        }
         b.kill();
     }
 
     addControls(){
+        this.addSpaceBar();
+        this.addMouseClick();
+        this.addEscapeToQuit();
+    }
+
+    addEscapeToQuit() {
+        let escape = this.game.input.keyboard.addKey(Phaser.Keyboard.ESC);
+        escape.onDown.add(this.gameOver, this);
+    }
+
+    addMouseClick() {
+        this.game.input.onDown.add(this.helicopter.setRising, this.helicopter);
+        this.game.input.onUp.add(this.helicopter.setFalling, this.helicopter);
+    }
+
+    addSpaceBar() {
         let space = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
         space.onDown.add(this.helicopter.setRising, this.helicopter);
         space.onUp.add(this.helicopter.setFalling, this.helicopter);
-        this.game.input.onDown.add(this.helicopter.setRising, this.helicopter);
-        this.game.input.onUp.add(this.helicopter.setFalling, this.helicopter);
-
-        let escape = this.game.input.keyboard.addKey(Phaser.Keyboard.ESC);
-        escape.onDown.add(this.gameOver, this);
     }
 
     addTimers(){
