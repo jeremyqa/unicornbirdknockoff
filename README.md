@@ -12,3 +12,8 @@ It tracks your top score and the cost of the next panda you'll hit.  Picking up 
 I had some trouble making the game actually fun at first, but I think I hit an okay point.  In an earlier version, before I made the panda costs go up, it was easy to get to a point where it was hard to lose.  Like, you got too big to fail.  This was amusing given the narrative context (such as there is), but it wasn't any fun.
 
 Thanks.
+
+Unicorn and coin came from opengameart.org
+https://opengameart.org/content/running-unicorn
+http://opengameart.org/content/spinning-pixel-coin-0
+They're under a creative commons license: https://creativecommons.org/licenses/by/3.0/
