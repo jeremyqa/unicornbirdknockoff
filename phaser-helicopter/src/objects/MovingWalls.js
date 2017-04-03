@@ -4,7 +4,7 @@ class MovingWalls {
 
         this.game = game;
         this.spriteGroup = null;
-        this.badPoints = -1000;
+        this.badPoints = -10000;
 
         let seed = Date.now();
         this.random = new Phaser.RandomDataGenerator([seed]);
@@ -31,7 +31,7 @@ class MovingWalls {
 
         this.coinGroup = this.game.add.group();
         this.coinGroup.enableBody = true;
-        this.coinGroup.createMultiple(15, 'coin');
+        this.coinGroup.createMultiple(30, 'coin');
         this.coinGroup.callAll('animations.add', 'animations', 'spin', [0, 1, 2, 3, 4, 5, 6, 7, 8], 10, true);
     }
 

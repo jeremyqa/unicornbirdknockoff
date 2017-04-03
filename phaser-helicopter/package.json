@@ -1,7 +1,7 @@
 {
-  "name": "phaser-es6-boilerplate",
+  "name": "unicornbirdknockoff",
   "version": "1.0.2",
-  "description": "Tiny flexible template for writing Phaser games in ES6/ES2015 with Babel.",
+  "description": "unicorn knockoff",
   "main": "src/index.js",
   "scripts": {
     "start": "gulp",
@@ -9,9 +9,9 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/belohlavek/phaser-es6-boilerplate"
+    "url": "https://github.com/jeremyqa/unicornbirdknockoff"
   },
-  "author": "Daniel Belohlavek",
+  "author": "Jeremy Block",
   "license": "MIT",
   "devDependencies": {
     "babelify": "^6.1.3",
