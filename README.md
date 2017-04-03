@@ -14,6 +14,9 @@ I had some trouble making the game actually fun at first, but I think I hit an o
 Thanks.
 
 Unicorn and coin came from opengameart.org
+
 https://opengameart.org/content/running-unicorn
+
 http://opengameart.org/content/spinning-pixel-coin-0
+
 They're under a creative commons license: https://creativecommons.org/licenses/by/3.0/
