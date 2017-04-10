@@ -3,7 +3,6 @@ import MovingWalls from 'objects/MovingWalls';
 
 class Main extends Phaser.State {
     create() {
-        console.log("hello world -- test");
         this.highScore = localStorage.getItem("highScore");
         this.highPandaCost = localStorage.getItem("highPandaCost");
 
@@ -102,7 +101,6 @@ class Main extends Phaser.State {
     }
 
     gameOver(){
-        console.log(this.highPandaCost);
         localStorage.setItem("highScore", this.highScore);
         localStorage.setItem("highPandaCost", this.highPandaCost);
         this.game.state.start('GameOver')
