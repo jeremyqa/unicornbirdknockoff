@@ -3,8 +3,11 @@ import Platforms from 'objects/Platforms';
 
 class Main extends Phaser.State {
     create() {
-        this.debug = false;
+        this.game.add.tileSprite(0, 0, 1920, 1920, 'background');
         this.game.physics.startSystem(Phaser.Physics.ARCADE);
+        // this.game.physics.startSystem(Phaser.Physics.P2JS);
+        // this.game.physics.p2.setImpactEvents(true);
+        // this.game.physics.p2.restitution = 0.8;
         this.game.stage.backgroundColor = '#6699CC';
 
         this.player = new Player(this.game);
@@ -15,8 +18,10 @@ class Main extends Phaser.State {
         this.addControls();
         this.addTimers();
 
-        // this.game.world.setBounds(0, 0, 1920, 1920);
-        // this.game.camera.follow(this.player.sprite);
+        this.game.world.setBounds(0, 0, 1920, 1920);
+        this.game.camera.follow(this.player.sprite);
+
+        this.brickTimer = this.game.time.now;
 
         // this.platforms = this.game.add.physicsGroup();
         // this.platforms.enableBody = true;
@@ -26,22 +31,42 @@ class Main extends Phaser.State {
         // this.platforms.create(400, 200, 'panda');
         // this.platforms.setAll('body.immovable', true);
 
+
     }
 
     update() {
-        // console.log(this.player);
-        // console.log(this.player.sprite.body.position.y, this.player.sprite.body.position.x);
+        this.player.stopLateral();
         this.game.physics.arcade.collide(this.player.sprite, this.platforms.getGroup());
         this.game.physics.arcade.collide(this.platforms.getGroup());
+
+        // this.game.physics.arcade.collide(this.player.sprite, this.platforms.getGroup());
+        // this.game.physics.arcade.collide(this.platforms.getGroup());
+
+
+
+
         // this.game.physics.arcade.overlap(this.player.sprite, this.platforms.spriteGroup, this.collideDecision, null, this);
         // this.game.physics.arcade.overlap(this.player.sprite, this.platforms.coinGroup, this.collideDecision, null, this);
 
-        if(this.player.isRising){
-            this.player.increaseVerticalVelocity();
-        }
 
         if(this.player.sprite.body.blocked.down === true || this.player.sprite.body.blocked.up == true) {
             // console.log('edge');
+        }
+
+        if(this.right.isDown) {
+            this.player.moveRight();
+        }
+        if(this.left.isDown) {
+            this.player.moveLeft();
+        }
+        // jumpButton.isDown && (player.body.onFloor() || player.body.touching.down
+        if(this.jump.isDown && (this.player.sprite.body.blocked.down || this.player.sprite.body.touching.down)) {
+            this.player.increaseVerticalVelocity();
+        }
+        if(this.space.isDown && this.game.time.now > this.brickTimer) {
+            this.platforms.addBrick();
+            this.brickTimer = this.game.time.now + 1000;
+
         }
     }
 
@@ -55,20 +80,20 @@ class Main extends Phaser.State {
 
 
     addKeyboardInput() {
-        let jump = this.game.input.keyboard.addKey(Phaser.Keyboard.W);
-        let right = this.game.input.keyboard.addKey(Phaser.Keyboard.D);
-        let left = this.game.input.keyboard.addKey(Phaser.Keyboard.A);
-        let space = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+        this.jump = this.game.input.keyboard.addKey(Phaser.Keyboard.W);
+        this.right = this.game.input.keyboard.addKey(Phaser.Keyboard.D);
+        this.left = this.game.input.keyboard.addKey(Phaser.Keyboard.A);
+        this.space = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
 
-        jump.onDown.add(this.player.setRising, this.player);
-        jump.onUp.add(this.player.setFalling, this.player);
-
-        right.onDown.add(this.player.moveRight, this.player);
-        // right.onUp.add(this.player.stopLateral, this.player);
-
-        left.onDown.add(this.player.moveLeft, this.player);
-        // left.onUp.add(this.player.stopLateral, this.player);
-        space.onDown.add(this.platforms.addBrick, this.platforms);
+        // jump.onDown.add(this.player.setRising, this.player);
+        // jump.onUp.add(this.player.setFalling, this.player);
+        //
+        // right.onDown.add(this.player.moveRight, this.player);
+        // // right.onUp.add(this.player.stopLateral, this.player);
+        //
+        // left.onDown.add(this.player.moveLeft, this.player);
+        // // left.onUp.add(this.player.stopLateral, this.player);
+        // space.onDown.add(this.platforms.addBrick, this.platforms);
 
 
     }
