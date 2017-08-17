@@ -12,7 +12,7 @@ class GameTitle extends Phaser.State {
 	}
 
     addInsructionsTextToTitle() {
-        this.text = this.game.add.text(this.game.world.centerX, 200, `COLLECT COINS - AVOID AUSTERITY PANDAS.\nLose points for touching the edge.\nHold mouse to fly up. \nRelease to fall.\nClick unicorn to start`, {
+        this.text = this.game.add.text(this.game.world.centerX, 200, `HACK DAY 2`, {
             font: "36px Arial",
             fill: "#ABCDEF",
             align: "center"

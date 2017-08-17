@@ -1,103 +1,80 @@
-import Helicopter from 'objects/Helicopter';
-import MovingWalls from 'objects/MovingWalls';
+import Player from 'objects/Player';
+import Platforms from 'objects/Platforms';
 
 class Main extends Phaser.State {
     create() {
-        this.highScore = localStorage.getItem("highScore");
-        this.highPandaCost = localStorage.getItem("highPandaCost");
-
-        if (this.highScore === null) {
-            this.highScore = 0;
-        }
-        
-        if (this.highPandaCost === null) {
-            this.highPandaCost = 0;
-        }
-        this.money = 0;
-
+        this.debug = false;
         this.game.physics.startSystem(Phaser.Physics.ARCADE);
         this.game.stage.backgroundColor = '#6699CC';
 
-        this.helicopter = new Helicopter(this.game);
-        this.helicopter.spawn();
+        this.player = new Player(this.game);
+        this.player.spawn();
 
-        this.walls = new MovingWalls(this.game);
+        this.platforms = new Platforms(this.game, this.player);
 
         this.addControls();
         this.addTimers();
 
-        this.text = this.game.add.text(225, 10, `scores here`, {
-            font: "20px Arial",
-            fill: "#000000",
-            align: "center"
-        });
-        this.text.anchor.setTo(0.5, 0.5);
+        // this.game.world.setBounds(0, 0, 1920, 1920);
+        // this.game.camera.follow(this.player.sprite);
+
+        // this.platforms = this.game.add.physicsGroup();
+        // this.platforms.enableBody = true;
+        // this.platforms.physicsBodyType = Phaser.Physics.ARCADE;
+        //
+        // this.platforms.create(600, 600, 'platform');
+        // this.platforms.create(400, 200, 'panda');
+        // this.platforms.setAll('body.immovable', true);
+
     }
 
     update() {
+        // console.log(this.player);
+        // console.log(this.player.sprite.body.position.y, this.player.sprite.body.position.x);
+        this.game.physics.arcade.collide(this.player.sprite, this.platforms.getGroup());
+        this.game.physics.arcade.collide(this.platforms.getGroup());
+        // this.game.physics.arcade.overlap(this.player.sprite, this.platforms.spriteGroup, this.collideDecision, null, this);
+        // this.game.physics.arcade.overlap(this.player.sprite, this.platforms.coinGroup, this.collideDecision, null, this);
 
-        this.game.physics.arcade.overlap(this.helicopter.sprite, this.walls.spriteGroup, this.collideDecision, null, this);
-        this.game.physics.arcade.overlap(this.helicopter.sprite, this.walls.coinGroup, this.collideDecision, null, this);
-
-        if(this.helicopter.isRising){
-            this.helicopter.increaseVerticalVelocity();
+        if(this.player.isRising){
+            this.player.increaseVerticalVelocity();
         }
 
-        this.money++;
-
-        if(this.money > this.highScore) {
-            this.highScore = this.money;
+        if(this.player.sprite.body.blocked.down === true || this.player.sprite.body.blocked.up == true) {
+            // console.log('edge');
         }
-        
-        if(this.money < 1) {
-            this.gameOver();
-        }
-
-        if(this.helicopter.sprite.body.blocked.down === true || this.helicopter.sprite.body.blocked.up == true) {
-            this.money -= 2;
-        }
-
-        this.text.setText(`$${this.money} Top: $${this.highScore} Panda Cost: -$${this.walls.getBadPoints()*-1}`);
     }
 
     collideDecision(a, b) {
-        this.money += b.points;
-        if (b.points < 0) {
-            if(this.highPandaCost > this.walls.getBadPoints()) {
-                this.highPandaCost = this.walls.getBadPoints();
-            }
-            this.walls.doubleBadPoints()
-        }
-        else {
-            this.walls.changeBadPoints(-100);
-        }
-        b.kill();
+
     }
 
     addControls(){
-        this.addSpaceBar();
-        this.addMouseClick();
-        this.addEscapeToQuit();
+        this.addKeyboardInput();
     }
 
-    addEscapeToQuit() {
-        let escape = this.game.input.keyboard.addKey(Phaser.Keyboard.ESC);
-        escape.onDown.add(this.gameOver, this);
-    }
 
-    addMouseClick() {
-        this.game.input.onDown.add(this.helicopter.setRising, this.helicopter);
-        this.game.input.onUp.add(this.helicopter.setFalling, this.helicopter);
-    }
-
-    addSpaceBar() {
+    addKeyboardInput() {
+        let jump = this.game.input.keyboard.addKey(Phaser.Keyboard.W);
+        let right = this.game.input.keyboard.addKey(Phaser.Keyboard.D);
+        let left = this.game.input.keyboard.addKey(Phaser.Keyboard.A);
         let space = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
-        space.onDown.add(this.helicopter.setRising, this.helicopter);
-        space.onUp.add(this.helicopter.setFalling, this.helicopter);
+
+        jump.onDown.add(this.player.setRising, this.player);
+        jump.onUp.add(this.player.setFalling, this.player);
+
+        right.onDown.add(this.player.moveRight, this.player);
+        // right.onUp.add(this.player.stopLateral, this.player);
+
+        left.onDown.add(this.player.moveLeft, this.player);
+        // left.onUp.add(this.player.stopLateral, this.player);
+        space.onDown.add(this.platforms.addBrick, this.platforms);
+
+
     }
 
     addTimers(){
-        this.game.time.events.loop(750, this.walls.spawn, this.walls);
+        // this.game.time.events.loop(750, this.platforms.spawn, this.platforms);
     }
 
     gameOver(){
