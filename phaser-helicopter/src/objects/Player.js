@@ -2,7 +2,6 @@ class Player {
 
     constructor(game){
         this.game = game;
-        this.isRising = false;
         this.sprite = null;
         this.facing = 'right'
     }
