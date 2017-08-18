@@ -40,7 +40,7 @@ class Platforms {
         coin.animations.play('spin', 10, true);
         coin.body.gravity.y = 200;
         coin.body.updateBounds(coin.scale.x, coin.scale.y);
-        coin.reset(this.player.sprite.body.position.x + this.game.rnd.realInRange(-1000, 1000), 0);
+        coin.reset(this.player.sprite.body.position.x + this.game.rnd.realInRange(-750, 750), 0);
         coin.body.velocity.x = 0;
         coin.body.immovable = false;
         coin.checkWorldBounds = true;

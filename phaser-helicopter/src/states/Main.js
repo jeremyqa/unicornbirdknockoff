@@ -31,22 +31,25 @@ class Main extends Phaser.State {
         this.ogreTimer = this.game.time.now;
         this.scoreTimer = this.game.time.now;
 
-        // this.platforms = this.game.add.physicsGroup();
-        // this.platforms.enableBody = true;
-        // this.platforms.physicsBodyType = Phaser.Physics.ARCADE;
-        //
-        // this.platforms.create(600, 600, 'platform');
-        // this.platforms.create(400, 200, 'panda');
-        // this.platforms.setAll('body.immovable', true);
-
+        this.text = this.game.add.text(225, 20, `scores here`, {
+            font: "20px Arial",
+            fill: "#000000",
+            align: "center"
+        });
+        this.text.anchor.setTo(0.5, 0.5);
+        this.text.fixedToCamera = true;
 
     }
 
     update() {
         if(this.game.time.now > this.scoreTimer) {
-            this.score += (this.platforms.coinGroup.countLiving() - this.platforms.ogreGroup.countLiving()) - (this.platforms.brickGroup.countLiving()*.1);
-            console.log(this.score);
-            this.scoreTimer = this.game.time.now + 2000;
+            let coinBonus = this.platforms.coinGroup.countLiving()*10;
+            let ogrePenalty = this.platforms.ogreGroup.countLiving()*10;
+            let brickPenalty = this.platforms.brickGroup.countLiving()*2;
+            this.score += coinBonus + ogrePenalty + brickPenalty;
+
+            this.scoreTimer = this.game.time.now + 1000;
+            this.text.setText(this.score);
         }
 
         this.player.stopLateral();
@@ -88,12 +91,12 @@ class Main extends Phaser.State {
         if(this.space.isDown && this.game.time.now > this.brickTimer) {
             this.platforms.playerDropBrick();
             this.platforms.addOgre();
-            this.brickTimer = this.game.time.now + 750;
+            this.brickTimer = this.game.time.now + 500;
         }
 
         if(this.game.time.now > this.coinTimer) {
             this.platforms.addGoodCoin();
-            this.coinTimer = this.game.time.now + this.game.rnd.realInRange(1000, 5000);
+            this.coinTimer = this.game.time.now + this.game.rnd.realInRange(1000, 3000);
         }
 
         if(this.game.time.now > this.ogreTimer) {
