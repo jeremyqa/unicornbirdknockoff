@@ -28,6 +28,7 @@ class Main extends Phaser.State {
         this.game.camera.follow(this.player.sprite);
 
         this.brickTimer = this.game.time.now;
+        this.coinTimer = this.game.time.now;
 
         // this.platforms = this.game.add.physicsGroup();
         // this.platforms.enableBody = true;
@@ -71,8 +72,11 @@ class Main extends Phaser.State {
         if(this.space.isDown && this.game.time.now > this.brickTimer) {
             this.platforms.playerDropBrick();
             this.brickTimer = this.game.time.now + 750;
-            this.platforms.addGoodCoin();
+        }
 
+        if(this.game.time.now > this.coinTimer) {
+            this.platforms.addGoodCoin();
+            this.coinTimer = this.game.time.now + this.game.rnd.realInRange(1000, 5000);
         }
     }
 

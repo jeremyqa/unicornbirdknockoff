@@ -1,24 +1,23 @@
-class Platforms {
+class User {
 
-    constructor(game, player){
+    constructor(game){
 
         this.game = game;
         this.spriteGroup = null;
-        this.player = player;
-        this.initBricks();
+        this.initUsers();
     }
     getGroup() {
         return this.spriteGroup;
     }
-    initBricks(){
+    initUsers(){
         this.spriteGroup = this.game.add.physicsGroup();
         this.spriteGroup.enableBody = true;
         this.spriteGroup.createMultiple(100, 'panda');
 
-        this.coinGroup = this.game.add.physicsGroup();
-        this.coinGroup.enableBody = true;
-        this.coinGroup.createMultiple(30, 'coin');
-        this.coinGroup.callAll('animations.add', 'animations', 'spin', [0, 1, 2, 3, 4, 5, 6, 7, 8], 10, true);
+        // this.coinGroup = this.game.add.group();
+        // this.coinGroup.enableBody = true;
+        // this.coinGroup.createMultiple(30, 'coin');
+        // this.coinGroup.callAll('animations.add', 'animations', 'spin', [0, 1, 2, 3, 4, 5, 6, 7, 8], 10, true);
     }
 
     spawn() {
@@ -32,19 +31,19 @@ class Platforms {
     addGoodCoin() {
         let coin = this.coinGroup.getFirstDead();
         coin.animations.play('spin', 10, true);
-        coin.body.gravity.y = 200;
-        coin.body.updateBounds(coin.scale.x, coin.scale.y);
-        coin.reset(this.game.rnd.realInRange(100, this.game.world.width-100), 100);
-        coin.body.velocity.x = 0;
-        coin.body.immovable = false;
+        coin.body.gravity.y = 0;
+        coin.reset(this.game.world.width, this.random.integerInRange(0, this.game.world.height));
+        coin.body.velocity.x = -750;
+        coin.body.immovable = true;
         coin.checkWorldBounds = true;
         coin.outOfBoundsKill = true;
+        coin.points = 1000;
     }
 
     playerDropBrick() {
         this.addBrick(this.player.sprite.body.position.x, this.player.sprite.body.position.y, .25, .25)
     }
-    
+
     addBrick(x, y, scalex, scaley) {
         let brick = this.spriteGroup.getFirstDead();
         brick.scale.setTo(scalex, scaley);
@@ -52,9 +51,14 @@ class Platforms {
         brick.body.gravity.y = 0;
 
         brick.reset(x, y);
-        
+
         brick.body.immovable = true;
         brick.body.collideWorldBounds = true;
+        //When the block leaves the screen, kill it
+        // brick.checkWorldBounds = true;
+        // brick.outOfBoundsKill = true;
+        // brick.points = this.badPoints;
+        return brick;
     }
 
 }
