@@ -28,12 +28,11 @@ class Platforms {
         ogre.body.gravity.y = 200;
         ogre.scale.setTo(5, 5);
         ogre.body.updateBounds(ogre.scale.x, ogre.scale.y);
-        ogre.reset(this.player.sprite.body.position.x, this.player.sprite.body.position.y-200);
+        ogre.reset(this.player.sprite.body.position.x + this.game.rnd.realInRange(-500, 500), 0);
         ogre.checkWorldBounds = true;
         ogre.outOfBoundsKill = true;
         ogre.body.immovable = false;
         ogre.animations.play('attack', 5, true);
-
     }
 
     addGoodCoin() {
@@ -41,7 +40,7 @@ class Platforms {
         coin.animations.play('spin', 10, true);
         coin.body.gravity.y = 200;
         coin.body.updateBounds(coin.scale.x, coin.scale.y);
-        coin.reset(this.game.rnd.realInRange(100, this.game.world.width-100), 100);
+        coin.reset(this.player.sprite.body.position.x + this.game.rnd.realInRange(-1000, 1000), 0);
         coin.body.velocity.x = 0;
         coin.body.immovable = false;
         coin.checkWorldBounds = true;
