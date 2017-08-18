@@ -4,11 +4,8 @@ import Platforms from 'objects/Platforms';
 class Main extends Phaser.State {
     create() {
         this.bg = this.game.add.tileSprite(0, 0, 1920, 1920, 'background');
-        // this.game.physics.startSystem(Phaser.Physics.ARCADE);
         
         this.game.physics.startSystem(Phaser.Physics.ARCADE);
-        // this.game.physics.p2.setImpactEvents(true);
-        // this.game.physics.p2.restitution = 0.8;
         this.game.stage.backgroundColor = '#6699CC';
 
         this.player = new Player(this.game);
@@ -16,9 +13,8 @@ class Main extends Phaser.State {
 
         this.platforms = new Platforms(this.game, this.player);
         
-        this.platforms.addBrick(100, 1500, .75, .75);
-        this.platforms.addBrick(600, 1500, .75, .75);
-        this.platforms.addBrick(1100, 1500, .75, .75);
+        this.platforms.addBrick(600, 1500, 1, 1);
+        this.platforms.addBrick(1100, 1500, 1, 1);
         this.platforms.addGoodCoin();
 
         this.addControls();
@@ -43,21 +39,25 @@ class Main extends Phaser.State {
 
     update() {
         this.player.stopLateral();
-        this.game.physics.arcade.collide(this.player.sprite, this.platforms.getGroup());
 
-        // this.game.physics.arcade.collide(this.player.sprite, this.platforms.coinGroup);
-        this.game.physics.arcade.collide(this.platforms.getGroup(),  this.platforms.coinGroup);
+        this.game.physics.arcade.collide(this.player.sprite, this.platforms.brickGroup);
+        this.game.physics.arcade.collide(this.player.sprite, this.platforms.coinGroup);
+        this.game.physics.arcade.collide(this.platforms.brickGroup,  this.platforms.coinGroup);
+
+        this.game.physics.arcade.collide(this.platforms.ogreGroup,  this.platforms.coinGroup);
+        this.game.physics.arcade.collide(this.platforms.ogreGroup,  this.platforms.brickGroup);
+        this.game.physics.arcade.collide(this.platforms.ogreGroup, this.player.sprite);
 
 
 
-
-        // this.game.physics.arcade.overlap(this.player.sprite, this.platforms.spriteGroup, this.collideDecision, null, this);
-        this.game.physics.arcade.collide(this.player.sprite, this.platforms.coinGroup, this.collideDecision, null, this);
+        // this.game.physics.arcade.overlap(this.player.sprite, this.platforms.brickGroup, this.collideDecision, null, this);
+        // this.game.physics.arcade.collide(this.player.sprite, this.platforms.coinGroup, this.collideDecision, null, this);
 
 
         if(this.player.sprite.body.blocked.down === true || this.player.sprite.body.blocked.up == true) {
             // console.log('edge');
         }
+        
 
         if(this.right.isDown) {
             this.player.moveRight();
@@ -71,6 +71,7 @@ class Main extends Phaser.State {
         }
         if(this.space.isDown && this.game.time.now > this.brickTimer) {
             this.platforms.playerDropBrick();
+            this.platforms.addOgre();
             this.brickTimer = this.game.time.now + 750;
         }
 

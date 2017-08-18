@@ -8,7 +8,7 @@ class Player {
 
     spawn(){
         
-        this.sprite = this.game.add.sprite(200, this.game.world.centerY, 'unicorn');
+        this.sprite = this.game.add.sprite(this.game.world.centerX, this.game.world.centerY, 'unicorn');
         this.sprite.name = "player";
         this.game.physics.arcade.enable(this.sprite);
         this.sprite.enableBody = true;
@@ -24,13 +24,6 @@ class Player {
 
     }
 
-    setRising(){
-        this.isRising = true;
-    }
-
-    setFalling(){
-        this.isRising = false;
-    }
 
     increaseVerticalVelocity() {
         // console.log(this.sprite.body.velocity.y);
@@ -61,14 +54,6 @@ class Player {
 
     stopLateral() {
         this.sprite.body.velocity.x = 0;
-    }
-
-    isOutOfBounds(){
-
-        let position = this.sprite.body.position.y;
-
-        return position > this.game.world.height || position < 0;
-
     }
 
 }

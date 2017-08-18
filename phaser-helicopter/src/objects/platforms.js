@@ -3,30 +3,37 @@ class Platforms {
     constructor(game, player){
 
         this.game = game;
-        this.spriteGroup = null;
         this.player = player;
         this.initBricks();
     }
-    getGroup() {
-        return this.spriteGroup;
-    }
+    
     initBricks(){
-        this.spriteGroup = this.game.add.physicsGroup();
-        this.spriteGroup.enableBody = true;
-        this.spriteGroup.createMultiple(100, 'panda');
+        this.brickGroup = this.game.add.physicsGroup();
+        this.brickGroup.enableBody = true;
+        this.brickGroup.createMultiple(100, 'grass');
 
         this.coinGroup = this.game.add.physicsGroup();
         this.coinGroup.enableBody = true;
         this.coinGroup.createMultiple(30, 'coin');
         this.coinGroup.callAll('animations.add', 'animations', 'spin', [0, 1, 2, 3, 4, 5, 6, 7, 8], 10, true);
+
+        this.ogreGroup = this.game.add.physicsGroup();
+        this.ogreGroup.enableBody = true;
+        this.ogreGroup.createMultiple(30, 'ogre');
+        this.ogreGroup.callAll('animations.add', 'animations', 'attack', [0, 1, 2, 3], 10, true);
     }
 
-    spawn() {
-        // let num_coins = this.random.integerInRange(0,4); // to do this is stupid
-        // for(var i=0;i<num_coins;i++){
-        //     this.addGoodCoin();
-        // }
-        // this.addBrick();
+    addOgre() {
+        let ogre = this.ogreGroup.getFirstDead();
+        ogre.body.gravity.y = 200;
+        ogre.scale.setTo(5, 5);
+        ogre.body.updateBounds(ogre.scale.x, ogre.scale.y);
+        ogre.reset(this.player.sprite.body.position.x, this.player.sprite.body.position.y-200);
+        ogre.checkWorldBounds = true;
+        ogre.outOfBoundsKill = true;
+        ogre.body.immovable = false;
+        ogre.animations.play('attack', 5, true);
+
     }
 
     addGoodCoin() {
@@ -41,12 +48,20 @@ class Platforms {
         coin.outOfBoundsKill = true;
     }
 
+
     playerDropBrick() {
-        this.addBrick(this.player.sprite.body.position.x, this.player.sprite.body.position.y, .25, .25)
+        this.xdelta = 0;
+        if(this.player.facing == "right") {
+            this.xdelta = 125;
+        }
+        else if (this.player.facing == "left") {
+            this.xdelta = -125;
+        }
+        this.addBrick(this.player.sprite.body.position.x + this.xdelta, this.player.sprite.body.position.y+120, 1, 1)
     }
     
     addBrick(x, y, scalex, scaley) {
-        let brick = this.spriteGroup.getFirstDead();
+        let brick = this.brickGroup.getFirstDead();
         brick.scale.setTo(scalex, scaley);
         brick.body.updateBounds(brick.scale.x, brick.scale.y);
         brick.body.gravity.y = 0;
