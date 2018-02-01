@@ -5,6 +5,8 @@ class Main extends Phaser.State {
     create() {
         this.score = 0;
         this.destroy = false;
+        this.shootTimer = this.game.time.now;
+        this.invulnTimer = this.game.time.now;
 
         this.bg = this.game.add.tileSprite(0, 0, 1920, 1920, 'background');
         
@@ -18,7 +20,8 @@ class Main extends Phaser.State {
         
         this.platforms.addBrick(600, 1500, 1, 1);
         this.platforms.addBrick(1100, 1500, 1, 1);
-        this.platforms.addGoodCoin();
+        this.platforms.addOgre(300, 300);
+        this.platforms.addOgre(300, 600);
 
         this.addKeyboardInput();
         this.addTimers();
@@ -26,9 +29,6 @@ class Main extends Phaser.State {
         this.game.world.setBounds(0, 0, 1920, 1920);
         this.game.camera.follow(this.player.sprite);
 
-        this.brickTimer = this.game.time.now;
-        this.coinTimer = this.game.time.now;
-        this.ogreTimer = this.game.time.now;
         this.scoreTimer = this.game.time.now;
 
         this.text = this.game.add.text(225, 20, `scores here`, {
@@ -43,98 +43,97 @@ class Main extends Phaser.State {
 
     update() {
         if(this.game.time.now > this.scoreTimer) {
-            let coinBonus = this.platforms.coinGroup.countLiving()*10;
-            let ogrePenalty = this.platforms.ogreGroup.countLiving()*10;
-            let brickPenalty = this.platforms.brickGroup.countLiving()*2;
-            this.score += coinBonus + ogrePenalty + brickPenalty;
-
-            this.scoreTimer = this.game.time.now + 1000;
             this.text.setText(this.score);
         }
 
-        this.player.stopLateral();
+        this.player.stopMovement();
+        //  collide(object1, object2, collideCallback, processCallback, callbackContext)
 
-        this.game.physics.arcade.collide(this.player.sprite, this.platforms.brickGroup, null, this.removeDecision, this);
-        this.game.physics.arcade.collide(this.player.sprite, this.platforms.coinGroup);
-        this.game.physics.arcade.collide(this.platforms.brickGroup,  this.platforms.coinGroup);
-
-        this.game.physics.arcade.collide(this.platforms.ogreGroup,  this.platforms.brickGroup);
-        this.game.physics.arcade.collide(this.platforms.ogreGroup, this.player.sprite);
+      // ogre and coins
+      this.game.physics.arcade.collide(this.platforms.ogreGroup, this.platforms.coinGroup, this.damageOgre, null, this);
 
 
-
-        // this.game.physics.arcade.overlap(this.player.sprite, this.platforms.brickGroup, this.collideDecision, null, this);
-        // this.game.physics.arcade.collide(this.player.sprite, this.platforms.coinGroup, this.collideDecision, null, this);
-        this.game.physics.arcade.collide(this.platforms.ogreGroup, this.platforms.coinGroup, this.collideDecision, null, this);
+      // coins and walls:
+      this.game.physics.arcade.collide(this.platforms.brickGroup,  this.platforms.coinGroup);
 
 
-        if(this.player.sprite.body.blocked.down === true || this.player.sprite.body.blocked.up == true) {
-            // console.log('edge');
-        }
+      // creatures -> walls:
+      this.game.physics.arcade.collide(this.player.sprite, this.platforms.brickGroup, null, null, this);
+      this.game.physics.arcade.collide(this.platforms.ogreGroup,  this.platforms.brickGroup);
 
-        if(this.remove.isDown) {
-            this.destroy = true;
-        }
-        if(!this.remove.isDown) {
-            this.destroy = false;
-        }
-        if(this.right.isDown) {
-            this.player.moveRight();
-        }
-        if(this.left.isDown) {
-            this.player.moveLeft();
-        }
-        // jumpButton.isDown && (player.body.onFloor() || player.body.touching.down
-        if(this.jump.isDown && (this.player.sprite.body.blocked.down || this.player.sprite.body.touching.down)) {
-            this.player.increaseVerticalVelocity();
-        }
-        if(this.space.isDown && this.game.time.now > this.brickTimer) {
-            this.platforms.playerDropBrick();
-            this.platforms.addOgre();
-            this.brickTimer = this.game.time.now + 500;
-        }
+      // player <- ogre hit:
+      this.game.physics.arcade.collide(this.platforms.ogreGroup, this.player.sprite, this.ogreHitPlayer,null, this);
 
-        if(this.game.time.now > this.coinTimer) {
-            this.platforms.addGoodCoin();
-            this.coinTimer = this.game.time.now + this.game.rnd.realInRange(1000, 3000);
-        }
 
-        if(this.game.time.now > this.ogreTimer) {
-            this.platforms.addOgre();
-            this.ogreTimer = this.game.time.now + this.game.rnd.realInRange(10000, 20000);
-        }
+      this.checkMovementKeys();
+      this.checkFireKeys();
+      if(this.invulnTimer < this.game.time.now) {
+        this.player.sprite.tint = 0xFFFFFF;
+      }
     }
 
-    collideDecision(a, b) {
-        b.kill();
+
+    ogreHitPlayer(player, ogre) { // this is confusing which is which
+      if(this.invulnTimer > this.game.time.now) {
+        return;
+      }
+      player.body.sprite.tint = 0x000000;
+      this.invulnTimer = this.game.time.now + 200;
     }
 
-    removeDecision(a, b) {
-        if(this.destroy) {
-            b.kill();
+    damageOgre(ogre, coin) {
+      coin.kill();
+      ogre.hp--;
+      ogre.body.sprite.tint = 0xff0000;
+      if(ogre.hp <= 0) {
+        ogre.kill();
+      }
+    }
+
+    checkMovementKeys() {
+      if(this.right.isDown) {
+        this.player.moveRight();
+      }
+      if(this.left.isDown) {
+        this.player.moveLeft();
+      }
+      if(this.up.isDown) {
+        this.player.moveUp();
+      }
+      if(this.down.isDown) {
+        this.player.moveDown();
+      }
+    }
+    checkFireKeys() {
+      if(this.game.time.now > this.shootTimer) {
+        if(this.cursors.left.isDown) {
+            this.platforms.addProjectile(-500, 0);
+            this.shootTimer = this.game.time.now + 500;
+          }
+        else if(this.cursors.right.isDown) {
+          this.platforms.addProjectile(500, 0);
+          this.shootTimer = this.game.time.now + 500;
         }
-    }
+        else if(this.cursors.up.isDown) {
+          this.platforms.addProjectile(0, -500);
+          this.shootTimer = this.game.time.now + 500;
+        }
+        else if(this.cursors.down.isDown) {
+          this.platforms.addProjectile(0, 500);
+          this.shootTimer = this.game.time.now + 500;
+        }
 
+      }
+    }
     addKeyboardInput() {
-        this.jump = this.game.input.keyboard.addKey(Phaser.Keyboard.W);
+        this.up = this.game.input.keyboard.addKey(Phaser.Keyboard.W);
+        this.down = this.game.input.keyboard.addKey(Phaser.Keyboard.S);
         this.right = this.game.input.keyboard.addKey(Phaser.Keyboard.D);
         this.left = this.game.input.keyboard.addKey(Phaser.Keyboard.A);
         this.space = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
-        this.remove = this.game.input.keyboard.addKey(Phaser.Keyboard.E);
-
-        // jump.onDown.add(this.player.setRising, this.player);
-        // jump.onUp.add(this.player.setFalling, this.player);
-        //
-        // right.onDown.add(this.player.moveRight, this.player);
-        // // right.onUp.add(this.player.stopLateral, this.player);
-        //
-        // left.onDown.add(this.player.moveLeft, this.player);
-        // // left.onUp.add(this.player.stopLateral, this.player);
-        // space.onDown.add(this.platforms.addBrick, this.platforms);
-
+        this.cursors = this.game.input.keyboard.createCursorKeys();
 
     }
-
     addTimers(){
         // this.game.time.events.loop(750, this.platforms.spawn, this.platforms);
     }
