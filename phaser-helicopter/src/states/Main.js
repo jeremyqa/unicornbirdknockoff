@@ -121,6 +121,7 @@ class Main extends Phaser.State {
       }
       if(this.boostTimer < this.game.time.now) {
         this.shootDelay = 400;
+        this.player.sprite.tint = 0xCCCCCC;
       }
     }
 
@@ -131,11 +132,14 @@ class Main extends Phaser.State {
       if(this.invulnTimer > this.game.time.now) {
         return;
       }
-      player.body.sprite.tint = 0x000000;
-      this.invulnTimer = this.game.time.now + 200;
+      this.makePlayerInvuln(200);
       this.money -= 1000;
     }
 
+    makePlayerInvuln(time) {
+      this.player.sprite.tint = 0x000000;
+      this.invulnTimer = this.game.time.now + time;
+    }
     damageMonster(monster, coin) {
       coin.kill();
       monster.hp--;
@@ -207,7 +211,8 @@ class Main extends Phaser.State {
 
   spawmMonstersAtLevel(level) {
     let fuzz = this.game.rnd.integerInRange(0,2);
-    for(var i=0; i<fuzz; i++) {
+    for(var i=0; i<fuzz+level; i++) {
+      this.makePlayerInvuln(500);
       this.platforms.randomFly();
       this.platforms.randomOgre();
       this.platforms.randomPanda();
