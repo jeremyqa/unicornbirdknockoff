@@ -8,7 +8,7 @@ class Main extends Phaser.State {
         this.shootTimer = this.game.time.now;
         this.invulnTimer = this.game.time.now;
         this.boostTimer = this.game.time.now;
-        this.level = 1;
+        this.level = 0;
 
         this.bg = this.game.add.tileSprite(0, 0, 1920, 1920, 'background');
         
@@ -21,8 +21,8 @@ class Main extends Phaser.State {
         this.platforms = new Platforms(this.game, this.player);
         
         // this.platforms.addBrick(50, 0, 10, 1);
-        this.platforms.addTreasure(500, 500, 0, 0);
-        this.platforms.addPanda(1300, 300, 0, 0);
+        this.platforms.addTreasure(1500, 500, 0, 0);
+        // this.platforms.addPanda(1300, 300, 0, 0);
         // this.platforms.addOgre(1300, 300, 0, 0);
         // this.platforms.addFly(500, 500);
         // this.platforms.addOgre(300, 600, 0, 0);
@@ -34,7 +34,7 @@ class Main extends Phaser.State {
         this.game.world.setBounds(0, 0, 1920, 1920);
         this.game.camera.follow(this.player.sprite);
 
-        this.text = this.game.add.text(225, 25, `scores here`, {
+        this.text = this.game.add.text(250, 25, `scores here`, {
             font: "50px Arial",
             fill: "#FFFFFF",
             align: "center"
@@ -51,8 +51,8 @@ class Main extends Phaser.State {
           this.shootDelay = Math.max(this.shootDelay-250, 100);
           this.boostTimer = this.game.time.now + 2000;
         }
-        console.log('hit space');
       }
+
       if (this.money < 0) {
         this.gameOver();
       }
@@ -64,7 +64,7 @@ class Main extends Phaser.State {
       }
 
       this.player.stopMovement();
-      this.text.setText(`$${this.money}`);
+      this.text.setText(`$${this.money} - ${this.getSeries()}`);
 
 
       this.addMonsterBehaviors();
@@ -75,7 +75,7 @@ class Main extends Phaser.State {
     }
 
 
-    addMonsterBehaviors() {
+    addMonsterBehaviors() { // consider moving to a timer instead of doing it in update
       this.platforms.ogreGroup.forEachAlive(this.platforms.seekPlayer, this, 300);
       this.platforms.bugGroup.forEachAlive(this.platforms.randomMovement, this, 150);
       this.platforms.pandaGroup.forEachAlive(this.platforms.fireAtPlayer, this.platforms);
@@ -142,7 +142,7 @@ class Main extends Phaser.State {
     }
     damageMonster(monster, coin) {
       coin.kill();
-      monster.hp--;
+      monster.hp--; //todo: use built-in health and damage methods
       if(monster.hp == 1) {
         monster.body.sprite.tint = 0xff0000;
       }
@@ -225,6 +225,21 @@ class Main extends Phaser.State {
         // localStorage.setItem("highPandaCost", this.highPandaCost);
         this.game.state.start('GameOver')
     }
+  getSeries() {
+    switch(this.level) {
+      case 0:
+        return 'SEED';
+      case 1:
+        return 'SERIES A';
+      case 2:
+        return 'SERIES B';
+      case 3:
+        return 'SERIES C';
+      case 4:
+        return 'SERIES D';
+    }
+    return 'SERIES E+';
+  }
 
 }
 
