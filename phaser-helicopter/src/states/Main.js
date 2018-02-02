@@ -4,7 +4,7 @@ import Platforms from 'objects/Platforms';
 class Main extends Phaser.State {
     create() {
         this.money = 10000;
-        this.shootDelay = 500;
+        this.shootDelay = 400;
         this.shootTimer = this.game.time.now;
         this.invulnTimer = this.game.time.now;
         this.level = 1;
@@ -43,6 +43,13 @@ class Main extends Phaser.State {
     }
 
     update() {
+      if(this.space.isDown) {
+        if(this.money > 10000) {
+          this.money -= 8000;
+          this.shootDelay = Math.max(this.shootDelay-100, 100);
+        }
+        console.log('hit space');
+      }
       if (this.money < 0) {
         this.gameOver();
       }
@@ -72,7 +79,7 @@ class Main extends Phaser.State {
 
     getTreasure(player, treasure) {
       treasure.kill();
-      this.money += 1000;
+      this.money += 1500;
     }
 
     addCollideRules() {
@@ -114,15 +121,19 @@ class Main extends Phaser.State {
       }
       player.body.sprite.tint = 0x000000;
       this.invulnTimer = this.game.time.now + 200;
-      this.money -= 500;
+      this.money -= 1000;
     }
 
-    damageMonster(ogre, coin) {
+    damageMonster(monster, coin) {
       coin.kill();
-      ogre.hp--;
-      ogre.body.sprite.tint = 0xff0000;
-      if(ogre.hp <= 0) {
-        ogre.kill();
+      monster.hp--;
+      monster.body.sprite.tint = 0xff0000;
+      if(monster.hp <= 0) {
+        monster.kill();
+        if(this.game.rnd.integerInRange(1,10) > 0) {
+          this.platforms.randomTreasure();
+        }
+
       }
     }
 
@@ -162,7 +173,6 @@ class Main extends Phaser.State {
           this.platforms.addProjectile(0, 500);
           this.shootTimer = this.game.time.now + this.shootDelay;
         }
-
       }
     }
     addKeyboardInput() {
@@ -175,8 +185,8 @@ class Main extends Phaser.State {
 
     }
     addTimers(){
-        // this.game.time.events.loop(1000, this.platforms.randomOgre, this.platforms);
-        // this.game.time.events.loop(1000, this.platforms.randomFly, this.platforms);
+        this.game.time.events.loop(2000, this.platforms.randomOgre, this.platforms);
+        this.game.time.events.loop(2000, this.platforms.randomFly, this.platforms);
         // this.game.time.events.loop(10000, this.platforms.randomTreasure, this.platforms);
     }
 

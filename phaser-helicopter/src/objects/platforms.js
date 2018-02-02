@@ -72,8 +72,8 @@ class Platforms {
 
   addTreasure(xcoord, ycoord, xVel, yVel) {
     let treasure = this.treasureGroup.getFirstDead();
-    treasure.scale.setTo(1,1);
-    treasure.body.updateBounds(1,1);
+    treasure.scale.setTo(.5,.5);
+    treasure.body.updateBounds(.5,.5);
     treasure.reset(xcoord, ycoord);
     treasure.checkWorldBounds = true;
     treasure.body.immovable = true;
@@ -108,23 +108,24 @@ class Platforms {
 
   randomOgre() { // todo: consolidate randomFoo methods
     if(this.ogreGroup.countLiving() < 5) {
-      this.addOgre(0, this.game.rnd.integerInRange(100, 1000, 0, 0));
+      this.addOgre(this.game.rnd.integerInRange(100, 200), this.game.rnd.integerInRange(100, 1000), 0, 0);
     }
   }
 
   randomTreasure() {
-    if(this.treasureGroup.countLiving() < 1) {
+    if(this.treasureGroup.countLiving() < 3) {
       this.addTreasure(this.game.rnd.integerInRange(100, 1000), this.game.rnd.integerInRange(100, 1000, 0, 0))
     }
   }
 
   randomFly() {
     if(this.bugGroup.countLiving() < 5) {
-      this.addFly(0, this.game.rnd.integerInRange(100, 1000, 0, 0))
+      this.addFly(this.game.rnd.integerInRange(100, 1000), this.game.rnd.integerInRange(100, 1000), 0, 0)
     }
   }
 
     addProjectile(xVelocity, yVelocity) {
+      if(this.coinGroup.countLiving() < 30) {
         let coin = this.coinGroup.getFirstDead();
         coin.animations.play('spin', 10, true);
 
@@ -136,6 +137,7 @@ class Platforms {
         coin.body.immovable = true;
         coin.checkWorldBounds = true;
         coin.outOfBoundsKill = true;
+      }
     }
 
     
