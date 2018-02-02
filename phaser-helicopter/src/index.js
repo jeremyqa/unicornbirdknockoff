@@ -12,7 +12,7 @@ class Game extends Phaser.Game {
         let windowWidth = window.innerWidth * window.devicePixelRatio;
         let windowHeight = window.innerHeight * window.devicePixelRatio;
 
-        super(Math.min(maxWidth, windowWidth), Math.min(maxHeight, windowHeight), Phaser.AUTO);
+        super(Math.min(maxWidth, windowWidth), Math.min(maxHeight, windowHeight), Phaser.CANVAS);
         this.state.add('Boot', Boot, false);
         this.state.add('Preload', Preload, false);
         this.state.add('GameTitle', GameTitle, false);
