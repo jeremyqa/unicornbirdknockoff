@@ -9,9 +9,16 @@ class Platforms {
         this.initOgreGroup();
         this.initTreasure();
         this.initBugs();
+        this.initPanda();
 
     }
-  
+
+    initPanda() {
+      this.pandaGroup = this.game.add.physicsGroup();
+      this.pandaGroup.enableBody = true;
+      this.pandaGroup.createMultiple(4, 'panda');
+    }
+
     initBugs() {
       this.bugGroup = this.game.add.physicsGroup();
       this.bugGroup.enableBody = true;
@@ -66,9 +73,22 @@ class Platforms {
 
     child.body.velocity.y += this.game.rnd.integerInRange(-300, 300);
     child.body.velocity.y = Math.max(-400, Math.min(child.body.velocity.y, 400));
-
   }
 
+  fireAtPlayer(child) {
+    if (this.game.time.now > child.fireTimer && this.game.rnd.integerInRange(1,100) > 95 && this.ogreGroup.countLiving() < 10) {
+      child.fireTimer = this.game.time.now + 1000;
+      let xVel = 500;
+      let yVel = 500;
+      if (child.body.position.x > this.player.sprite.body.position.x) {
+        xVel *= -1;
+      }
+      if (child.body.position.y > this.player.sprite.body.position.y) {
+        yVel *= -1;
+      }
+      this.addOgre(child.body.position.x, child.body.position.y, xVel, yVel);
+    }
+  }
 
   addTreasure(xcoord, ycoord, xVel, yVel) {
     let treasure = this.treasureGroup.getFirstDead();
@@ -106,12 +126,40 @@ class Platforms {
         ogre.body.velocity.y = yVelocity;
     }
 
-  randomOgre() { // todo: consolidate randomFoo methods
-    if(this.ogreGroup.countLiving() < 5) {
-      this.addOgre(this.game.rnd.integerInRange(100, 200), this.game.rnd.integerInRange(100, 1000), 0, 0);
+  addPanda(xCoord, yCoord, xVelocity, yVelocity) {
+    if(this.pandaGroup.countLiving() == 0) {
+      let panda = this.pandaGroup.getFirstDead();
+      panda.hp = 10;
+      panda.reset(xCoord, yCoord);
+      panda.checkWorldBounds = true;
+      panda.outOfBoundsKill = true;
+      panda.body.immovable = true;
+      panda.body.sprite.tint = 0xFFFFFF;
+      panda.body.velocity.x = xVelocity;
+      panda.body.velocity.y = yVelocity;
+      panda.fireTimer = this.game.time.now;
     }
   }
 
+  randomOgre() { // todo: consolidate randomFoo methods
+    let displacement = this.game.rnd.integerInRange(400, 800); // displace from player
+    let side = this.game.rnd.pick([-1, 1]);
+    let xloc = (displacement * side) + this.player.sprite.body.position.x;
+    let yloc = (displacement * side) + this.player.sprite.body.position.y;
+    if(this.ogreGroup.countLiving() < 5) {
+      this.addOgre(xloc, yloc, 0, 0);
+    }
+  }
+
+  randomPanda() {
+    let displacement = this.game.rnd.integerInRange(400, 800); // displace from player
+    let side = this.game.rnd.pick([-1, 1]);
+    let xloc = (displacement * side) + this.player.sprite.body.position.x;
+    let yloc = (displacement * side) + this.player.sprite.body.position.y;
+    if(this.pandaGroup.countLiving() < 3) {
+      this.addPanda(xloc, yloc, 0, 0);
+    }
+  }
   randomTreasure() {
     if(this.treasureGroup.countLiving() < 3) {
       this.addTreasure(this.game.rnd.integerInRange(100, 1000), this.game.rnd.integerInRange(100, 1000, 0, 0))
