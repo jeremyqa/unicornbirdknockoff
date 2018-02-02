@@ -2,6 +2,7 @@ class GameTitle extends Phaser.State {
 
 	create() {
         this.game.stage.backgroundColor = '#000000';
+        this.game.world.setBounds(0, 0, 1000, 1000);
         this.addUnicornToTitleScreen();
         this.addCoinToTitleScreen();
         this.addInsructionsTextToTitle();
@@ -12,7 +13,7 @@ class GameTitle extends Phaser.State {
 	}
 
     addInsructionsTextToTitle() {
-        this.text = this.game.add.text(this.game.world.centerX, 200, `DESTROY PROBLEMS WITH MONEY.\n\nHACK DAY JAN 2018\nv3.0.0 PRE-RELEASE`, {
+        this.text = this.game.add.text(this.game.world.centerX, 200, `DESTROY PROBLEMS WITH MONEY.\n\nHACK DAY JAN 2018\nv3.0.2 PRE-RELEASE`, {
             font: "36px Arial",
             fill: "#ABCDEF",
             align: "center"

@@ -3,7 +3,8 @@ class Player {
     constructor(game){
         this.game = game;
         this.sprite = null;
-        this.facing = 'right'
+        this.facing = 'right';
+        this.moveSpeed = 750;
     }
 
     spawn(){
@@ -25,20 +26,20 @@ class Player {
 
 
     moveUp() {
-        this.sprite.body.velocity.y -= 1000;
+        this.sprite.body.velocity.y -= this.moveSpeed;
     }
     moveDown() {
-      this.sprite.body.velocity.y += 1000;
+      this.sprite.body.velocity.y += this.moveSpeed;
     }
     moveRight() {
-        this.sprite.body.velocity.x += 1000;
+        this.sprite.body.velocity.x += this.moveSpeed;
         if (this.facing == 'left') {
             this.sprite.scale.x *= -1;
             this.facing = 'right';
         }
     }
     moveLeft() {
-        this.sprite.body.velocity.x -= 1000;
+        this.sprite.body.velocity.x -= this.moveSpeed;
         if (this.facing == 'right') {
             this.sprite.scale.x *= -1;
             this.facing = 'left';

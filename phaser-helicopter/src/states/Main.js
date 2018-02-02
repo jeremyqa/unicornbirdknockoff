@@ -3,10 +3,11 @@ import Platforms from 'objects/Platforms';
 
 class Main extends Phaser.State {
     create() {
-        this.score = 0;
-        this.destroy = false;
+        this.money = 10000;
+        this.shootDelay = 500;
         this.shootTimer = this.game.time.now;
         this.invulnTimer = this.game.time.now;
+        this.level = 1;
 
         this.bg = this.game.add.tileSprite(0, 0, 1920, 1920, 'background');
         
@@ -18,10 +19,12 @@ class Main extends Phaser.State {
 
         this.platforms = new Platforms(this.game, this.player);
         
-        this.platforms.addBrick(600, 1500, 1, 1);
-        this.platforms.addBrick(1100, 1500, 1, 1);
-        this.platforms.addOgre(300, 300);
-        this.platforms.addOgre(300, 600);
+        // this.platforms.addBrick(50, 0, 10, 1);
+        this.platforms.addTreasure(50, 100, 0, 0);
+        // this.platforms.addOgre(1300, 300, 0, 0);
+        // this.platforms.addFly(500, 500);
+        // this.platforms.addOgre(300, 600, 0, 0);
+        // this.platforms.addOgre(300, 900, 0, 0);
 
         this.addKeyboardInput();
         this.addTimers();
@@ -29,10 +32,8 @@ class Main extends Phaser.State {
         this.game.world.setBounds(0, 0, 1920, 1920);
         this.game.camera.follow(this.player.sprite);
 
-        this.scoreTimer = this.game.time.now;
-
         this.text = this.game.add.text(225, 20, `scores here`, {
-            font: "20px Arial",
+            font: "42px Arial",
             fill: "#000000",
             align: "center"
         });
@@ -42,46 +43,81 @@ class Main extends Phaser.State {
     }
 
     update() {
-        if(this.game.time.now > this.scoreTimer) {
-            this.text.setText(this.score);
-        }
+      if (this.money < 0) {
+        this.gameOver();
+      }
 
-        this.player.stopMovement();
-        //  collide(object1, object2, collideCallback, processCallback, callbackContext)
+      if(this.platforms.countOfEnemies() == 0) {
+        this.platforms.randomTreasure();
+        this.level++;
+        this.spawmMonstersAtLevel(this.level);
+      }
 
-      // ogre and coins
-      this.game.physics.arcade.collide(this.platforms.ogreGroup, this.platforms.coinGroup, this.damageOgre, null, this);
-
-
-      // coins and walls:
-      this.game.physics.arcade.collide(this.platforms.brickGroup,  this.platforms.coinGroup);
-
-
-      // creatures -> walls:
-      this.game.physics.arcade.collide(this.player.sprite, this.platforms.brickGroup, null, null, this);
-      this.game.physics.arcade.collide(this.platforms.ogreGroup,  this.platforms.brickGroup);
-
-      // player <- ogre hit:
-      this.game.physics.arcade.collide(this.platforms.ogreGroup, this.player.sprite, this.ogreHitPlayer,null, this);
+      this.player.stopMovement();
+      this.text.setText(this.money);
 
 
+      this.addMonsterBehaviors();
+      this.addCollideRules();
       this.checkMovementKeys();
       this.checkFireKeys();
+      this.checkInvuln();
+    }
+
+
+    addMonsterBehaviors() {
+      this.platforms.ogreGroup.forEachAlive(this.platforms.seekPlayer, this, 300);
+      this.platforms.bugGroup.forEachAlive(this.platforms.randomMovement, this, 150);
+    }
+
+    getTreasure(player, treasure) {
+      treasure.kill();
+      this.money += 1000;
+    }
+
+    addCollideRules() {
+    //  collide(object1, object2, collideCallback, processCallback, callbackContext)
+
+    // monsters and coins
+    this.game.physics.arcade.collide(this.platforms.ogreGroup, this.platforms.coinGroup, this.damageMonster, null, this);
+    this.game.physics.arcade.collide(this.platforms.bugGroup, this.platforms.coinGroup, this.damageMonster, null, this);
+
+    // ogre & bugs
+    this.game.physics.arcade.collide(this.platforms.ogreGroup, this.platforms.bugGroup, null, null, this);
+
+    // coins and walls:
+    this.game.physics.arcade.collide(this.platforms.brickGroup,  this.platforms.coinGroup);
+
+    // creatures -> walls:
+    this.game.physics.arcade.collide(this.player.sprite, this.platforms.brickGroup, null, null, this);
+    this.game.physics.arcade.collide(this.platforms.ogreGroup,  this.platforms.brickGroup);
+
+    // player <- ogre hit:
+    this.game.physics.arcade.collide(this.platforms.ogreGroup, this.player.sprite, this.monsterHitPlayer,null, this);
+      this.game.physics.arcade.collide(this.platforms.bugGroup, this.player.sprite, this.monsterHitPlayer,null, this);
+
+    //player and treasure
+    this.game.physics.arcade.collide(this.player.sprite, this.platforms.treasureGroup, this.getTreasure, null, this);
+  }
+
+    checkInvuln() {
       if(this.invulnTimer < this.game.time.now) {
         this.player.sprite.tint = 0xFFFFFF;
       }
     }
 
-
-    ogreHitPlayer(player, ogre) { // this is confusing which is which
+    monsterHitPlayer(player, monster) { // this is confusing which is which
+      this.player.sprite.body.velocity.x += (monster.body.velocity.x)*10;
+      this.player.sprite.body.velocity.y += (monster.body.velocity.y)*10;
       if(this.invulnTimer > this.game.time.now) {
         return;
       }
       player.body.sprite.tint = 0x000000;
       this.invulnTimer = this.game.time.now + 200;
+      this.money -= 500;
     }
 
-    damageOgre(ogre, coin) {
+    damageMonster(ogre, coin) {
       coin.kill();
       ogre.hp--;
       ogre.body.sprite.tint = 0xff0000;
@@ -107,20 +143,24 @@ class Main extends Phaser.State {
     checkFireKeys() {
       if(this.game.time.now > this.shootTimer) {
         if(this.cursors.left.isDown) {
+            this.money -= 100; // todo: don't copy paste this
             this.platforms.addProjectile(-500, 0);
-            this.shootTimer = this.game.time.now + 500;
+            this.shootTimer = this.game.time.now + this.shootDelay;
           }
         else if(this.cursors.right.isDown) {
+          this.money -= 100; // todo: don't copy paste this
           this.platforms.addProjectile(500, 0);
-          this.shootTimer = this.game.time.now + 500;
+          this.shootTimer = this.game.time.now + this.shootDelay;
         }
         else if(this.cursors.up.isDown) {
+          this.money -= 100; // todo: don't copy paste this
           this.platforms.addProjectile(0, -500);
-          this.shootTimer = this.game.time.now + 500;
+          this.shootTimer = this.game.time.now + this.shootDelay;
         }
         else if(this.cursors.down.isDown) {
+          this.money -= 100; // todo: don't copy paste this
           this.platforms.addProjectile(0, 500);
-          this.shootTimer = this.game.time.now + 500;
+          this.shootTimer = this.game.time.now + this.shootDelay;
         }
 
       }
@@ -135,12 +175,23 @@ class Main extends Phaser.State {
 
     }
     addTimers(){
-        // this.game.time.events.loop(750, this.platforms.spawn, this.platforms);
+        // this.game.time.events.loop(1000, this.platforms.randomOgre, this.platforms);
+        // this.game.time.events.loop(1000, this.platforms.randomFly, this.platforms);
+        // this.game.time.events.loop(10000, this.platforms.randomTreasure, this.platforms);
     }
 
+
+  spawmMonstersAtLevel(level) {
+    let fuzz = this.game.rnd.integerInRange(0,2);
+    for(var i=0; i<fuzz; i++) {
+      this.platforms.randomFly();
+      this.platforms.randomOgre()
+    }
+
+  }
     gameOver(){
-        localStorage.setItem("highScore", this.highScore);
-        localStorage.setItem("highPandaCost", this.highPandaCost);
+        // localStorage.setItem("highScore", this.highScore);
+        // localStorage.setItem("highPandaCost", this.highPandaCost);
         this.game.state.start('GameOver')
     }
 

@@ -2,9 +2,12 @@ class GameOver extends Phaser.State {
 
 	create() {
         console.log("game over, man");
+        this.game.camera.follow(null);
+        this.game.world.setBounds(0, 0, 1500, 600);
+        // this.restartGame();
         this.showMainMessage();
-        this.showHighPandaCost();
-        this.showHiringMessage();
+        // this.showHighPandaCost();
+        // this.showHiringMessage();
         }
 
     showMainMessage() {
@@ -54,7 +57,7 @@ class GameOver extends Phaser.State {
     }
 
 	restartGame() {
-        this.game.state.start("GameTitle");
+        this.game.state.start("Boot");
 	}
 
     update() {

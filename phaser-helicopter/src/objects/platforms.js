@@ -7,32 +7,91 @@ class Platforms {
         this.initBricks();
         this.initCoinGroup();
         this.initOgreGroup();
+        this.initTreasure();
+        this.initBugs();
+
     }
-    
+  
+    initBugs() {
+      this.bugGroup = this.game.add.physicsGroup();
+      this.bugGroup.enableBody = true;
+      this.bugGroup.createMultiple(20, 'fly');
+    }
+  
     initBricks(){
         this.brickGroup = this.game.add.physicsGroup();
         this.brickGroup.enableBody = true;
-        this.brickGroup.createMultiple(100, 'grass');
-
+        this.brickGroup.createMultiple(10, 'grass');
     }
 
     initOgreGroup() {
       this.ogreGroup = this.game.add.physicsGroup();
       this.ogreGroup.enableBody = true;
-      this.ogreGroup.createMultiple(30, 'ogre');
+      this.ogreGroup.createMultiple(20, 'ogre');
       this.ogreGroup.callAll('animations.add', 'animations', 'attack', [0, 1, 2, 3], 10, true);
     }
 
     initCoinGroup() {
       this.coinGroup = this.game.add.physicsGroup();
       this.coinGroup.enableBody = true;
-      this.coinGroup.createMultiple(30, 'coin');
+      this.coinGroup.createMultiple(30, 'coin'); // make sure this doesn't fill up
       this.coinGroup.callAll('animations.add', 'animations', 'spin', [0, 1, 2, 3, 4, 5, 6, 7, 8], 10, true);
     }
 
+    initTreasure() {
+      this.treasureGroup = this.game.add.physicsGroup();
+      this.treasureGroup.enableBody = true;
+      this.treasureGroup.createMultiple(30, 'treasure');  // limit spawns. is there a smart way to do that?
+    }
 
 
-  addOgre(xCoord, yCoord) {
+  seekPlayer(child, speed) { // todo: make them turn towards the player?
+    if(child.body.position.x > this.player.sprite.body.position.x) {
+      child.body.velocity.x = speed * -1;
+    }
+    if(child.body.position.y > this.player.sprite.body.position.y) {
+      child.body.velocity.y = speed * -1;
+    }
+    if(child.body.position.x < this.player.sprite.body.position.x) {
+      child.body.velocity.x = speed;
+    }
+    if(child.body.position.y < this.player.sprite.body.position.y) {
+      child.body.velocity.y = speed;
+    }
+  }
+
+  randomMovement(child, speed) { // todo: use speed. favor moving towards center.
+    child.body.velocity.x += this.game.rnd.integerInRange(-300, 300);
+    child.body.velocity.x = Math.max(-400, Math.min(child.body.velocity.x, 400));
+
+    child.body.velocity.y += this.game.rnd.integerInRange(-300, 300);
+    child.body.velocity.y = Math.max(-400, Math.min(child.body.velocity.y, 400));
+
+  }
+
+
+  addTreasure(xcoord, ycoord, xVel, yVel) {
+    let treasure = this.treasureGroup.getFirstDead();
+    treasure.scale.setTo(1,1);
+    treasure.body.updateBounds(1,1);
+    treasure.reset(xcoord, ycoord);
+    treasure.checkWorldBounds = true;
+    treasure.body.immovable = true;
+  }
+  
+  addFly(xcoord, ycoord) {
+    let bug = this.bugGroup.getFirstDead();
+    bug.hp = 2;
+    bug.scale.setTo(1,1);
+    bug.body.updateBounds(1,1);
+    bug.reset(xcoord, ycoord);
+    bug.checkWorldBounds = true;
+    bug.body.immovable = true;
+    bug.outOfBoundsKill = true;
+    bug.body.sprite.tint = 0xFFFFFF;
+  }
+  
+  addOgre(xCoord, yCoord, xVelocity, yVelocity) {
         let ogre = this.ogreGroup.getFirstDead();
         ogre.hp = 2;
         ogre.scale.setTo(5, 5);
@@ -40,10 +99,30 @@ class Platforms {
         ogre.reset(xCoord, yCoord);
         ogre.checkWorldBounds = true;
         ogre.outOfBoundsKill = true;
-        ogre.body.immovable = true;
+        ogre.body.immovable = false;
         ogre.animations.play('attack', 5, true);
         ogre.body.sprite.tint = 0xFFFFFF;
+        ogre.body.velocity.x = xVelocity;
+        ogre.body.velocity.y = yVelocity;
     }
+
+  randomOgre() { // todo: consolidate randomFoo methods
+    if(this.ogreGroup.countLiving() < 5) {
+      this.addOgre(0, this.game.rnd.integerInRange(100, 1000, 0, 0));
+    }
+  }
+
+  randomTreasure() {
+    if(this.treasureGroup.countLiving() < 1) {
+      this.addTreasure(this.game.rnd.integerInRange(100, 1000), this.game.rnd.integerInRange(100, 1000, 0, 0))
+    }
+  }
+
+  randomFly() {
+    if(this.bugGroup.countLiving() < 5) {
+      this.addFly(0, this.game.rnd.integerInRange(100, 1000, 0, 0))
+    }
+  }
 
     addProjectile(xVelocity, yVelocity) {
         let coin = this.coinGroup.getFirstDead();
@@ -54,22 +133,11 @@ class Platforms {
         coin.body.velocity.x = xVelocity;
         coin.body.updateBounds(coin.scale.x, coin.scale.y);
 
-        coin.body.immovable = false;
+        coin.body.immovable = true;
         coin.checkWorldBounds = true;
         coin.outOfBoundsKill = true;
     }
 
-
-    playerDropBrick() {
-        this.xdelta = 0;
-        if(this.player.facing == "right") {
-            this.xdelta = 125;
-        }
-        else if (this.player.facing == "left") {
-            this.xdelta = -125;
-        }
-        this.addBrick(this.player.sprite.body.position.x + this.xdelta, this.player.sprite.body.position.y+120, 1, 1)
-    }
     
     addBrick(x, y, scalex, scaley) {
         let brick = this.brickGroup.getFirstDead();
@@ -83,6 +151,10 @@ class Platforms {
         brick.body.collideWorldBounds = true;
     }
 
+    countOfEnemies() {
+      return this.ogreGroup.countLiving() + this.bugGroup.countLiving() + this.treasureGroup.countLiving();
+    }
+  
 }
 
 export default Platforms;
